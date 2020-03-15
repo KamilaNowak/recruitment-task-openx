@@ -2,7 +2,13 @@ package com.nowak.openxrecruitmenttask.dtos.users;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Company {
 
     @SerializedName("name")
@@ -14,29 +20,5 @@ public class Company {
     @SerializedName("bs")
     @Expose
     private String bs;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getCatchPhrase() {
-        return catchPhrase;
-    }
-
-    public void setCatchPhrase(String catchPhrase) {
-        this.catchPhrase = catchPhrase;
-    }
-
-    public String getBs() {
-        return bs;
-    }
-
-    public void setBs(String bs) {
-        this.bs = bs;
-    }
 
 }

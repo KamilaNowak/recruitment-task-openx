@@ -9,6 +9,7 @@ import com.nowak.openxrecruitmenttask.dtos.users.User;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +23,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 @SpringBootTest
 @WebMvcTest(Controller.class)
@@ -33,10 +36,6 @@ class OpenxRecruitmentTaskApplicationTests {
     String BASE_API_URL = "https://jsonplaceholder.typicode.com";
     final String USERS = "/users";
     String POSTS = "/posts";
-
-    @Test
-    void contextLoads() {
-    }
 
     @Autowired
     private MockMvc mockMvc;
@@ -55,7 +54,7 @@ class OpenxRecruitmentTaskApplicationTests {
         ResponseEntity<List<User>> response = restTemplate.exchange(BASE_API_URL + USERS, HttpMethod.GET, null, new ParameterizedTypeReference<List<User>>() {
         });
         assertEquals(200, response.getStatusCode());
-        assertEquals(false, response.getBody().isEmpty());
+        assertEquals(false, Objects.requireNonNull(response.getBody()).isEmpty());
         assertEquals(true, response.hasBody());
     }
 
@@ -64,7 +63,7 @@ class OpenxRecruitmentTaskApplicationTests {
         ResponseEntity<List<UserInfo>> response = restTemplate.exchange(BASE_API_URL + POSTS, HttpMethod.GET, null, new ParameterizedTypeReference<List<UserInfo>>() {
         });
         assertEquals(200, response.getStatusCode());
-        assertEquals(false, response.getBody().isEmpty());
+        assertEquals(false, Objects.requireNonNull(response.getBody()).isEmpty());
         assertEquals(true, response.hasBody());
     }
 
@@ -72,7 +71,10 @@ class OpenxRecruitmentTaskApplicationTests {
     public void testgetCountUsersPosts() throws Exception {
         String uri = "/count";
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(uri)
-                .accept(MediaType.APPLICATION_JSON_VALUE)).andReturn();
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.count").exists())
+                .andReturn();
         assertEquals(200, mvcResult.getResponse().getStatus());
 
         int contentLength = mvcResult.getResponse().getContentLength();
@@ -83,7 +85,10 @@ class OpenxRecruitmentTaskApplicationTests {
     public void testcheckIfPostsAreUnique() throws Exception {
         String uri = "/unique";
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(uri)
-                .accept(MediaType.APPLICATION_JSON_VALUE)).andReturn();
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.summary").exists())
+                .andReturn();
         assertEquals(200, mvcResult.getResponse().getStatus());
         int contentLength = mvcResult.getResponse().getContentLength();
         assertTrue(contentLength > 0);
@@ -93,7 +98,23 @@ class OpenxRecruitmentTaskApplicationTests {
     public void testgetListOfUsersAndNeighbour() throws Exception {
         String uri = "/nearest";
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(uri)
-                .accept(MediaType.APPLICATION_JSON_VALUE)).andReturn();
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.nearest").exists())
+                .andReturn();
+
+        assertEquals(200, mvcResult.getResponse().getStatus());
+        int contentLength = mvcResult.getResponse().getContentLength();
+        assertTrue(contentLength > 0);
+    }
+    @Test
+    public void testmergeTwoApis() throws Exception {
+        String uri = "/summary";
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(uri)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.summary").exists())
+                .andReturn();
         assertEquals(200, mvcResult.getResponse().getStatus());
         int contentLength = mvcResult.getResponse().getContentLength();
         assertTrue(contentLength > 0);
